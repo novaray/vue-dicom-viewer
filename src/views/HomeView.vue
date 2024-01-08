@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import TestDicomComponent from '@/components/TestDicomComponent.vue';
 </script>
 
 <template>
-  <main>
-  </main>
+  <Suspense>
+    <TestDicomComponent />
+  </Suspense>
 </template>
