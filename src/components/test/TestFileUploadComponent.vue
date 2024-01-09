@@ -89,17 +89,17 @@ const run = async () => {
     type: ViewportType.STACK,
     element,
     defaultOptions: {
-      background: <Types.Point3>[0.2, 0, 0.2],
+      background: <Types.Point3> [0.2, 0, 0.2],
     },
   };
 
   renderingEngine.enableElement(viewportInput);
 
   // Get the stack viewport that was created
-  viewport.value = <Types.IStackViewport>renderingEngine.getViewport(viewportId);
+  viewport.value = <Types.IStackViewport> renderingEngine.getViewport(viewportId);
 
   toolGroup.addViewport(viewportId, renderingEngineId);
-}
+};
 
 const onChangeFile = (event: Event) => {
   const files = (event.target as HTMLInputElement).files;
@@ -170,14 +170,14 @@ const loadAndViewImage = async (imageId: string) => {
     metadata.push({
       info: 'direction',
       value: imageData.direction
-        .map((x: number) => Math.round(x * 100) / 100)
-        .join(','),
+                      .map((x: number) => Math.round(x * 100) / 100)
+                      .join(','),
     });
     metadata.push({
       info: 'origin',
       value: imageData.origin
-        .map((x: number) => Math.round(x * 100) / 100)
-        .join(','),
+                      .map((x: number) => Math.round(x * 100) / 100)
+                      .join(','),
     });
     metadata.push({
       info: 'modality',
@@ -212,7 +212,7 @@ const loadAndViewImage = async (imageId: string) => {
       value: voiLutModule.windowWidth,
     });
   });
-}
+};
 
 onMounted(run);
 </script>
@@ -245,8 +245,8 @@ onMounted(run);
             v-for="item in metadata"
             :key="item.info"
           >
-            <td>{{item.info}}</td>
-            <td>{{item.value}}</td>
+            <td>{{ item.info }}</td>
+            <td>{{ item.value }}</td>
           </tr>
         </tbody>
       </table>
