@@ -2,10 +2,12 @@
 import TestStackOfImageComponent from '@/components/test/TestStackOfImageComponent.vue';
 import TestVolumeComponent from '@/components/test/TestVolumeComponent.vue';
 import { ref } from 'vue';
+import TestVideoComponent from '@/components/test/TestVideoComponent.vue';
 
 const tabs = {
   TestStackOfImageComponent,
-  TestVolumeComponent
+  TestVolumeComponent,
+  TestVideoComponent
 };
 
 const currentComponent = ref(TestStackOfImageComponent);
