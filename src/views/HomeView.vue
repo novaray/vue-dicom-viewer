@@ -6,6 +6,7 @@ import TestVideoComponent from '@/components/test/TestVideoComponent.vue';
 import TestManipulationToolsComponent from '@/components/test/TestManipulationToolsComponent.vue';
 import TestAnnotationToolsComponent from '@/components/test/TestAnnotationToolsComponent.vue';
 import TestSegmentationToolsComponent from '@/components/test/TestSegmentationToolsComponent.vue';
+import TestFileUploadComponent from '@/components/test/TestFileUploadComponent.vue';
 
 const tabs = {
   TestStackOfImageComponent,
@@ -13,7 +14,8 @@ const tabs = {
   TestVideoComponent,
   TestManipulationToolsComponent,
   TestAnnotationToolsComponent,
-  TestSegmentationToolsComponent
+  TestSegmentationToolsComponent,
+  TestFileUploadComponent
 };
 
 const currentComponent = ref(TestStackOfImageComponent);
@@ -47,6 +49,6 @@ const onClickTab = (tab: any) => {
   flex-direction: row;
   align-items: center;
   margin: 1rem;
-  gap: 1rem;
+  gap: 0.6rem;
 }
 </style>
