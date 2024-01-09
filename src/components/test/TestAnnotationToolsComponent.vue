@@ -46,8 +46,8 @@ onMounted(async () => {
     imageIds,
   });
 
-  const viewportId1 = 'CT_AXIAL';
-  const viewportId2 = 'CT_SAGITTAL';
+  const viewportId1 = 'CT_AXIAL_ANNOTATION';
+  const viewportId2 = 'CT_SAGITTAL_ANNOTATION';
 
   const viewportInput = [
     {

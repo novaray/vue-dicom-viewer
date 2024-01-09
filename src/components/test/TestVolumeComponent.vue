@@ -37,7 +37,7 @@ onMounted(async () => {
   viewportGrid.appendChild(element1);
   viewportGrid.appendChild(element2);
 
-  content.appendChild(viewportGrid);
+  content!.appendChild(viewportGrid);
 
   const renderingEngineId = 'myRenderingEngine';
   const renderingEngine = new RenderingEngine(renderingEngineId);
