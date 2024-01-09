@@ -4,9 +4,11 @@ import { RenderingEngine } from '@cornerstonejs/core';
 import type { PublicViewportInput } from '@cornerstonejs/core/src/types/IViewport';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 
 await initDicom();
+
+const divTag = ref<HTMLDivElement | null>(null);
 
 onMounted(async () => {
   const getImageIds = async () => {
@@ -22,7 +24,7 @@ onMounted(async () => {
   };
   const imageIds: any[] = await getImageIds();
 
-  const content = document.getElementById('content');
+  const content = divTag.value;
   const element = document.createElement('div');
   element.style.width = '500px';
   element.style.height = '500px';
@@ -50,9 +52,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div id="content">
-
-  </div>
+  <div ref="divTag"/>
 </template>
 
 <style scoped lang="scss">
