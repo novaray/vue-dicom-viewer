@@ -4,12 +4,14 @@ import TestVolumeComponent from '@/components/test/TestVolumeComponent.vue';
 import { ref } from 'vue';
 import TestVideoComponent from '@/components/test/TestVideoComponent.vue';
 import TestManipulationToolsComponent from '@/components/test/TestManipulationToolsComponent.vue';
+import TestAnnotationToolsComponent from '@/components/test/TestAnnotationToolsComponent.vue';
 
 const tabs = {
   TestStackOfImageComponent,
   TestVolumeComponent,
   TestVideoComponent,
-  TestManipulationToolsComponent
+  TestManipulationToolsComponent,
+  TestAnnotationToolsComponent
 };
 
 const currentComponent = ref(TestStackOfImageComponent);
