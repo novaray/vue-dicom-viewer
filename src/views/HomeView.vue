@@ -7,6 +7,7 @@ import TestManipulationToolsComponent from '@/components/test/TestManipulationTo
 import TestAnnotationToolsComponent from '@/components/test/TestAnnotationToolsComponent.vue';
 import TestSegmentationToolsComponent from '@/components/test/TestSegmentationToolsComponent.vue';
 import TestFileUploadComponent from '@/components/test/TestFileUploadComponent.vue';
+import TestFileUploadManyToolComponent from '@/components/test/TestFileUploadManyToolComponent.vue';
 
 const tabs = {
   TestStackOfImageComponent,
@@ -15,7 +16,8 @@ const tabs = {
   TestManipulationToolsComponent,
   TestAnnotationToolsComponent,
   TestSegmentationToolsComponent,
-  TestFileUploadComponent
+  TestFileUploadComponent,
+  TestFileUploadManyToolComponent
 };
 
 const currentComponent = ref(TestStackOfImageComponent);
@@ -36,11 +38,9 @@ const onClickTab = (tab: any) => {
     </button>
   </div>
 
-  <keep-alive>
     <Suspense>
       <component :is="currentComponent"/>
     </Suspense>
-  </keep-alive>
 </template>
 
 <style scoped lang="scss">
