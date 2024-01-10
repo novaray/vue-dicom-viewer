@@ -37,7 +37,6 @@ export default function initCornerstoneDICOMImageLoader() {
       },
     },
   };
-  console.log(cornerstoneDICOMImageLoader);
   
   cornerstoneDICOMImageLoader.webWorkerManager.initialize(config);
 }
