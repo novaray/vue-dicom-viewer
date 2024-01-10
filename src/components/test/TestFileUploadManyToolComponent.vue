@@ -255,7 +255,6 @@ const onSelectChange = (event: Event) => {
 onMounted(run);
 
 onUnmounted(() => {
-  console.log(cache.getCacheSize());
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
   cornerstoneTools.destroy();
