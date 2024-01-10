@@ -107,6 +107,7 @@ const onChangeFile = (event: Event) => {
     return;
   }
 
+  metadata.length = 0;
   const file = files[0];
   const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(file);
   loadAndViewImage(imageId);
