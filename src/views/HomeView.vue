@@ -8,6 +8,7 @@ import TestAnnotationToolsComponent from '@/components/test/TestAnnotationToolsC
 import TestSegmentationToolsComponent from '@/components/test/TestSegmentationToolsComponent.vue';
 import TestFileUploadComponent from '@/components/test/TestFileUploadComponent.vue';
 import TestFileUploadManyToolComponent from '@/components/test/TestFileUploadManyToolComponent.vue';
+import TestUnzipFileComponent from '@/components/test/TestUnzipFileComponent.vue';
 
 const tabs = {
   TestStackOfImageComponent,
@@ -17,7 +18,8 @@ const tabs = {
   TestAnnotationToolsComponent,
   TestSegmentationToolsComponent,
   TestFileUploadComponent,
-  TestFileUploadManyToolComponent
+  TestFileUploadManyToolComponent,
+  TestUnzipFileComponent
 };
 
 const currentComponent = ref(TestStackOfImageComponent);
