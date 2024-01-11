@@ -11,15 +11,15 @@ import TestFileUploadManyToolComponent from '@/components/test/TestFileUploadMan
 import TestUnzipFileComponent from '@/components/test/TestUnzipFileComponent.vue';
 
 const tabs = {
-  TestStackOfImageComponent,
-  TestVolumeComponent,
-  TestVideoComponent,
-  TestManipulationToolsComponent,
-  TestAnnotationToolsComponent,
-  TestSegmentationToolsComponent,
-  TestFileUploadComponent,
-  TestFileUploadManyToolComponent,
-  TestUnzipFileComponent
+  'Stack_Of_Image': TestStackOfImageComponent,
+  'Volume': TestVolumeComponent,
+  'Video': TestVideoComponent,
+  'Manipulation_Tools': TestManipulationToolsComponent,
+  'Annotation_Tools': TestAnnotationToolsComponent,
+  'Segmentation_Tools': TestSegmentationToolsComponent,
+  'File_Upload': TestFileUploadComponent,
+  'File_Upload_Many_Tool': TestFileUploadManyToolComponent,
+  'Unzip_File': TestUnzipFileComponent
 };
 
 const currentComponent = ref(TestStackOfImageComponent);
@@ -30,27 +30,52 @@ const onClickTab = (tab: any) => {
 </script>
 
 <template>
-  <div class="flex-row">
-    <button
-      v-for="(tab, index) in tabs"
-      :key="index"
-      @click="onClickTab(tab)"
-    >
-      {{ tab.__name }}
-    </button>
-  </div>
+  <div>
+    <div class="tab-wrap">
+      <button
+        class="btn-grad"
+        v-for="(tab, key) in tabs"
+        :key="key"
+        @click="onClickTab(tab)"
+      >
+        {{ key }}
+      </button>
+    </div>
 
     <Suspense>
       <component :is="currentComponent"/>
     </Suspense>
+  </div>
 </template>
 
 <style scoped lang="scss">
-.flex-row {
+.tab-wrap {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin: 1rem;
-  gap: 0.6rem;
+  gap: 0.5rem;
+  width: 60vw;
+  overflow: auto;
+}
+
+.btn-grad {
+  background-image: linear-gradient(to right, #283048 0%, #859398  51%, #283048  100%);
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  box-shadow: 0 0 20px #eee;
+  border-radius: 10px;
+  display: block;
+}
+
+.btn-grad:hover {
+  background-position: right center;
+  color: #fff;
+  text-decoration: none;
 }
 </style>
