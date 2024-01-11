@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
@@ -9,6 +9,12 @@ import { cache, metaData, RenderingEngine, type Types } from '@cornerstonejs/cor
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
 import JSZip from 'jszip';
+import CommonLoadingSpinner from '@/components/common/CommonLoadingSpinner.vue';
+
+interface UnzipFile {
+  name: string;
+  imageId: string | undefined;
+}
 
 const zip = new JSZip();
 
@@ -28,11 +34,17 @@ const viewport = ref<Types.IViewport>();
 const renderingEngineId = 'myRenderingEngine';
 const renderingEngine = reactive(new RenderingEngine(renderingEngineId));
 
-const metadata = reactive<{
+const metadata = ref<{
   info: string,
   value: any
 }[]>([]);
-const filenames = ref<string[]>([]);
+const uploadedFiles = ref<UnzipFile[]>([]);
+const unzipLoading = ref(false);
+const fileMatchingLoading = ref(false);
+
+const isLoading = computed(() => unzipLoading.value || fileMatchingLoading.value);
+const getLoadingText = computed(() => unzipLoading.value ? '파일 압축 해제 중' : '파일 매칭 중');
+const getListClass = computed(() => isLoading.value ? 'cursor-wait' : 'cursor-pointer');
 
 const run = async () => {
   const content = divTag.value;
@@ -110,29 +122,61 @@ const onChangeFile = (event: Event) => {
     return;
   }
 
-  metadata.length = 0;
+  uploadedFiles.value = [];
+  metadata.value = [];
   const file = files[0];
-  let isLoadedFirstImage = false;
+  unzipLoading.value = true;
+  fileMatchingLoading.value = true;
   zip.loadAsync(file)
      .then((zip) => {
-       zip.forEach((relativePath, zipEntry) => {
-         if (zipEntry.dir) {
-           return;
-         }
+       unzipLoading.value = false;
+       const files = zip.filter((relativePath, zipEntry) => {
+                          if (zipEntry.dir) {
+                            return false;
+                          }
 
-         filenames.value.push(zipEntry.name);
+                          return zipEntry.name.endsWith('.dcm');
+                        })
+                        .sort((zipEntry1, zipEntry2) => fileNameSortPredicate(zipEntry1.name, zipEntry2.name));
 
-         if (!isLoadedFirstImage) {
-           isLoadedFirstImage = true; // TODO 테스트용으로 첫 번째만 불러옴. 추후 보정.
-           zipEntry.async('blob').then((blob) => {
-             const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(blob);
-             loadAndViewImage(imageId);
-           });
-         }
+       const promises = files.map((zipEntry) => {
+         return zipEntry.async('blob')
+                        .then((blob: Blob) => {
+                          const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(blob);
+                          return {
+                            name: zipEntry.name,
+                            imageId
+                          };
+                        });
        });
+
+       uploadedFiles.value = files.map((zieEntry) => ({
+         name: zieEntry.name,
+         imageId: undefined
+       }));
+
+       return Promise.all(promises);
      })
-     .catch((err) => console.error(err));
+     .then((unzipFiles: UnzipFile[]) => uploadedFiles.value = unzipFiles)
+     .catch((err) => console.error(err))
+     .finally(() => {
+       unzipLoading.value = false;
+       fileMatchingLoading.value = false;
+     });
 };
+
+const fileNameSortPredicate = (fileName1: string, fileName2: string) => {
+  const nameA = fileName1.toUpperCase();
+  const nameB = fileName2.toUpperCase();
+  if (nameA < nameB) {
+    return -1;
+  }
+  if (nameA > nameB) {
+    return 1;
+  }
+
+  return 0;
+}
 
 const loadAndViewImage = async (imageId: string) => {
   if (!viewport.value) {
@@ -165,75 +209,84 @@ const loadAndViewImage = async (imageId: string) => {
     const sopCommonModule = metaData.get('sopCommonModule', imageId);
     const transferSyntax = metaData.get('transferSyntax', imageId);
 
-    metadata.push({
+    metadata.value.push({
       info: 'transferSyntax',
       value: transferSyntax.transferSyntaxUID,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'sopClassUID',
       value: `${sopCommonModule.sopClassUID} [${uids[sopCommonModule.sopClassUID]}]`,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'sopInstanceUID',
       value: sopCommonModule.sopInstanceUID,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'rows',
       value: imageData.dimensions[0],
     });
-    metadata.push({
+    metadata.value.push({
       info: 'columns',
       value: imageData.dimensions[1],
     });
-    metadata.push({
+    metadata.value.push({
       info: 'spacing',
       value: imageData.spacing.join('\\'),
     });
-    metadata.push({
+    metadata.value.push({
       info: 'direction',
       value: imageData.direction
                       .map((x: number) => Math.round(x * 100) / 100)
                       .join(','),
     });
-    metadata.push({
+    metadata.value.push({
       info: 'origin',
       value: imageData.origin
                       .map((x: number) => Math.round(x * 100) / 100)
                       .join(','),
     });
-    metadata.push({
+    metadata.value.push({
       info: 'modality',
       value: imageData.metadata.Modality,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'pixelRepresentation',
       value: pixelRepresentation,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'bitsAllocated',
       value: bitsAllocated,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'bitsStored',
       value: bitsStored,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'highBit',
       value: highBit,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'photometricInterpretation',
       value: photometricInterpretation,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'windowCenter',
       value: voiLutModule.windowCenter,
     });
-    metadata.push({
+    metadata.value.push({
       info: 'windowWidth',
       value: voiLutModule.windowWidth,
     });
   });
+};
+
+const onClickFile = (file: UnzipFile) => {
+  if (!file.imageId) {
+    return;
+  }
+
+  metadata.value.length = 0;
+  loadAndViewImage(file.imageId);
 };
 
 onMounted(run);
@@ -247,7 +300,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex-row">
+  <div class="flex-row-wrap">
     <div>
       <input
         class="file-input"
@@ -280,13 +333,19 @@ onUnmounted(() => {
         </tbody>
       </table>
     </div>
-    <div>
-      <ul>
+    <div class="file-list-wrap">
+      <CommonLoadingSpinner
+        v-show="isLoading"
+        :text="getLoadingText"
+      />
+      <ul v-show="!unzipLoading">
         <li
-          v-for="fileName in filenames"
-          :key="fileName"
+          :class="getListClass"
+          v-for="file in uploadedFiles"
+          :key="file.name"
+          @click="onClickFile(file)"
         >
-          {{fileName}}
+          {{file.name}}
         </li>
       </ul>
     </div>
@@ -298,15 +357,34 @@ onUnmounted(() => {
   margin-bottom: 1rem;
 }
 
-.flex-row {
+.flex-row-wrap {
   display: flex;
   flex-direction: row;
-  align-items: baseline;
   margin: 1rem;
   gap: 0.6rem;
+  min-height: 800px;
 }
 
 .table-wrap {
   margin-top: 3rem;
+}
+
+.file-list-wrap {
+  margin-left: 1rem;
+  height: 550px;
+  width: 330px;
+  overflow: auto;
+  border: black solid 1px;
+}
+
+ul {
+  padding: revert;
+}
+
+li {
+  line-height: 1.8;
+  margin: 0;
+  padding-inline-start: 1.5em;
+  list-style-type: circle;
 }
 </style>
