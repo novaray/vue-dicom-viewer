@@ -9,6 +9,7 @@ import TestSegmentationToolsComponent from '@/components/test/TestSegmentationTo
 import TestFileUploadComponent from '@/components/test/TestFileUploadComponent.vue';
 import TestFileUploadManyToolComponent from '@/components/test/TestFileUploadManyToolComponent.vue';
 import TestUnzipFileComponent from '@/components/test/TestUnzipFileComponent.vue';
+import TestScrollVolumeComponent from '@/components/test/TestScrollVolumeComponent.vue';
 
 const tabs = {
   'Stack_Of_Image': TestStackOfImageComponent,
@@ -19,10 +20,11 @@ const tabs = {
   'Segmentation_Tools': TestSegmentationToolsComponent,
   'File_Upload': TestFileUploadComponent,
   'File_Upload_Many_Tool': TestFileUploadManyToolComponent,
-  'Unzip_File': TestUnzipFileComponent
+  'Unzip_File': TestUnzipFileComponent,
+  'Scroll_Volume': TestScrollVolumeComponent
 };
 
-const currentComponent = ref(TestStackOfImageComponent);
+const currentComponent = ref(TestScrollVolumeComponent);
 
 const onClickTab = (tab: any) => {
   currentComponent.value = tab;
