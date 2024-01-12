@@ -10,4 +10,5 @@ export default async function initDicom() {
   initVolumeLoader();
   await csRenderInit();
   await csToolsInit();
+  return true;
 }

@@ -1,33 +1,24 @@
 <script setup lang="ts">
-import TestStackOfImageComponent from '@/components/test/TestStackOfImageComponent.vue';
-import TestVolumeComponent from '@/components/test/TestVolumeComponent.vue';
 import { ref } from 'vue';
-import TestVideoComponent from '@/components/test/TestVideoComponent.vue';
-import TestManipulationToolsComponent from '@/components/test/TestManipulationToolsComponent.vue';
-import TestAnnotationToolsComponent from '@/components/test/TestAnnotationToolsComponent.vue';
-import TestSegmentationToolsComponent from '@/components/test/TestSegmentationToolsComponent.vue';
-import TestFileUploadComponent from '@/components/test/TestFileUploadComponent.vue';
-import TestFileUploadManyToolComponent from '@/components/test/TestFileUploadManyToolComponent.vue';
-import TestUnzipFileComponent from '@/components/test/TestUnzipFileComponent.vue';
-import TestScrollVolumeComponent from '@/components/test/TestScrollVolumeComponent.vue';
+import { useRouter } from 'vue-router';
+import initDicom from '@/helpers/dicom/initDicom';
+
+const router = useRouter();
+
+const init = ref(false);
+initDicom().then(() => init.value = true);
 
 const tabs = {
-  'Stack_Of_Image': TestStackOfImageComponent,
-  'Volume': TestVolumeComponent,
-  'Video': TestVideoComponent,
-  'Manipulation_Tools': TestManipulationToolsComponent,
-  'Annotation_Tools': TestAnnotationToolsComponent,
-  'Segmentation_Tools': TestSegmentationToolsComponent,
-  'File_Upload': TestFileUploadComponent,
-  'File_Upload_Many_Tool': TestFileUploadManyToolComponent,
-  'Unzip_File': TestUnzipFileComponent,
-  'Scroll_Volume': TestScrollVolumeComponent
+  'basicStackImage': 'Basic Stack Image',
+  'localFile': 'Local File',
+  'localFileWithTools': 'Local File With Tools',
+  'unzipFile': 'Unzip File',
 };
 
-const currentComponent = ref(TestUnzipFileComponent);
-
-const onClickTab = (tab: any) => {
-  currentComponent.value = tab;
+const onClickTab = (name: any) => {
+  router.push({
+    name
+  });
 };
 </script>
 
@@ -38,15 +29,13 @@ const onClickTab = (tab: any) => {
         class="btn-grad"
         v-for="(tab, key) in tabs"
         :key="key"
-        @click="onClickTab(tab)"
+        @click="onClickTab(key)"
       >
-        {{ key }}
+        {{ tab }}
       </button>
     </div>
 
-    <Suspense>
-      <component :is="currentComponent"/>
-    </Suspense>
+    <RouterView v-if="init"/>
   </div>
 </template>
 
@@ -66,7 +55,6 @@ const onClickTab = (tab: any) => {
   margin: 10px;
   padding: 15px 45px;
   text-align: center;
-  text-transform: uppercase;
   transition: 0.5s;
   background-size: 200% auto;
   color: white;

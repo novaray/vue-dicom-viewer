@@ -5,9 +5,10 @@ import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helper
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
-import { metaData, RenderingEngine, type Types } from '@cornerstonejs/core';
+import { cache, metaData, RenderingEngine, type Types } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const {
   PanTool,
@@ -16,7 +17,7 @@ const {
   ZoomTool,
   ToolGroupManager,
 } = cornerstoneTools;
-const toolGroupId = 'myToolGroup';
+const toolGroupId = 'ToolGroup_FileBasic';
 
 const divTag = ref<HTMLDivElement | null>(null);
 const viewport = ref<Types.IViewport>();
@@ -24,6 +25,9 @@ const metadata = reactive<{
   info: string,
   value: any
 }[]>([]);
+// Instantiate a rendering engine
+const renderingEngineId = 'RenderingEngine_FileBasic';
+const renderingEngine = reactive(new RenderingEngine(renderingEngineId));
 
 const run = async () => {
   const content = divTag.value;
@@ -75,12 +79,6 @@ const run = async () => {
   // As the Stack Scroll mouse wheel is a tool using the `mouseWheelCallback`
   // hook instead of mouse buttons, it does not need to assign any mouse button.
   toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
-
-  // Get Cornerstone imageIds and fetch metadata into RAM
-
-  // Instantiate a rendering engine
-  const renderingEngineId = 'myRenderingEngine';
-  const renderingEngine = new RenderingEngine(renderingEngineId);
 
   // Create a stack viewport
   const viewportId = 'CT_STACK';
@@ -216,6 +214,16 @@ const loadAndViewImage = async (imageId: string) => {
 };
 
 onMounted(run);
+
+onBeforeRouteLeave(() => {
+  cache.purgeCache();
+  ToolGroupManager.destroyToolGroup(toolGroupId);
+  cornerstoneTools.removeTool(PanTool);
+  cornerstoneTools.removeTool(WindowLevelTool);
+  cornerstoneTools.removeTool(StackScrollMouseWheelTool);
+  cornerstoneTools.removeTool(ZoomTool);
+  renderingEngine.destroy();
+});
 </script>
 
 <template>

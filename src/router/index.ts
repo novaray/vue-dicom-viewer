@@ -7,7 +7,29 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      children: [
+        {
+          path: '/basic-stack-image',
+          name: 'basicStackImage',
+          component: () => import('../views/example/ExampleStackOfImageView.vue')
+        },
+        {
+          path: '/local-file',
+          name: 'localFile',
+          component: () => import('../views/example/ExampleLocalFileView.vue')
+        },
+        {
+          path: '/local-file-with-tools',
+          name: 'localFileWithTools',
+          component: () => import('../views/example/ExampleFileUploadManyToolView.vue')
+        },
+        {
+          path: '/example-unzip',
+          name: 'unzipFile',
+          component: () => import('../views/example/ExampleUnzipFileView.vue')
+        },
+      ]
     }
   ]
 });

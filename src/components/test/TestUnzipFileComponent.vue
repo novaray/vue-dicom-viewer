@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
@@ -10,10 +10,8 @@ import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
 import JSZip from 'jszip';
 import CommonLoadingSpinner from '@/components/common/CommonLoadingSpinner.vue';
-import initDicom from '@/helpers/dicom/initDicom';
 import DicomCustomStackScrollMouseWheelTool from '@/models/dicom/custom/DicomCustomStackScrollMouseWheelTool';
-
-await initDicom();
+import { onBeforeRouteLeave } from 'vue-router';
 
 interface UnzipFile {
   name: string;
@@ -305,10 +303,13 @@ const setMetadata = (imageId: string) => {
 
 onMounted(run);
 
-onUnmounted(() => {
+onBeforeRouteLeave(() => {
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  cornerstoneTools.destroy();
+  cornerstoneTools.removeTool(PanTool);
+  cornerstoneTools.removeTool(WindowLevelTool);
+  cornerstoneTools.removeTool(DicomCustomStackScrollMouseWheelTool);
+  cornerstoneTools.removeTool(ZoomTool);
   renderingEngine.destroy();
 });
 </script>

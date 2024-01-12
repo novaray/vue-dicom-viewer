@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
@@ -8,6 +8,7 @@ import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
 import { metaData, RenderingEngine, type Types, cache } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const {
   LengthTool,
@@ -254,12 +255,19 @@ const onSelectChange = (event: Event) => {
 
 onMounted(run);
 
-onUnmounted(() => {
+onBeforeRouteLeave(() => {
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  cornerstoneTools.destroy();
+  cornerstoneTools.removeTool(LengthTool);
+  cornerstoneTools.removeTool(ProbeTool);
+  cornerstoneTools.removeTool(RectangleROITool);
+  cornerstoneTools.removeTool(EllipticalROITool);
+  cornerstoneTools.removeTool(CircleROITool);
+  cornerstoneTools.removeTool(BidirectionalTool);
+  cornerstoneTools.removeTool(AngleTool);
+  cornerstoneTools.removeTool(ArrowAnnotateTool);
   renderingEngine.destroy();
-})
+});
 </script>
 
 <template>
