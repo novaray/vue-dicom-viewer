@@ -10,6 +10,10 @@ import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
 import JSZip from 'jszip';
 import CommonLoadingSpinner from '@/components/common/CommonLoadingSpinner.vue';
+import initDicom from '@/helpers/dicom/initDicom';
+import DicomCustomStackScrollMouseWheelTool from '@/models/dicom/custom/DicomCustomStackScrollMouseWheelTool';
+
+await initDicom();
 
 interface UnzipFile {
   name: string;
@@ -21,7 +25,6 @@ const zip = new JSZip();
 const {
   PanTool,
   WindowLevelTool,
-  StackScrollMouseWheelTool,
   ZoomTool,
   ToolGroupManager,
 } = cornerstoneTools;
@@ -41,6 +44,7 @@ const metadata = ref<{
 const uploadedFiles = ref<UnzipFile[]>([]);
 const unzipLoading = ref(false);
 const fileMatchingLoading = ref(false);
+const stacks = ref<any[]>([]);
 
 const isLoading = computed(() => unzipLoading.value || fileMatchingLoading.value);
 const getLoadingText = computed(() => unzipLoading.value ? '파일 압축 해제 중' : '파일 매칭 중');
@@ -57,7 +61,7 @@ const run = async () => {
 
   cornerstoneTools.addTool(PanTool);
   cornerstoneTools.addTool(WindowLevelTool);
-  cornerstoneTools.addTool(StackScrollMouseWheelTool);
+  cornerstoneTools.addTool(DicomCustomStackScrollMouseWheelTool);
   cornerstoneTools.addTool(ZoomTool);
 
   // Define a tool group, which defines how mouse events map to tool commands for
@@ -68,7 +72,7 @@ const run = async () => {
   toolGroup.addTool(WindowLevelTool.toolName);
   toolGroup.addTool(PanTool.toolName);
   toolGroup.addTool(ZoomTool.toolName);
-  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
+  toolGroup.addTool(DicomCustomStackScrollMouseWheelTool.toolName);
 
   // Set the initial state of the tools, here all tools are active and bound to
   // Different mouse inputs
@@ -95,10 +99,10 @@ const run = async () => {
   });
   // As the Stack Scroll mouse wheel is a tool using the `mouseWheelCallback`
   // hook instead of mouse buttons, it does not need to assign any mouse button.
-  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
+  toolGroup.setToolActive(DicomCustomStackScrollMouseWheelTool.toolName);
 
   // Create a stack viewport
-  const viewportId = 'CT_STACK';
+  const viewportId = 'CT_STACK_UNZIP';
   const viewportInput = {
     viewportId,
     type: ViewportType.STACK,
@@ -157,7 +161,11 @@ const onChangeFile = (event: Event) => {
 
        return Promise.all(promises);
      })
-     .then((unzipFiles: UnzipFile[]) => uploadedFiles.value = unzipFiles)
+     .then((unzipFiles: UnzipFile[]) => {
+       uploadedFiles.value = unzipFiles;
+       const imageIds = uploadedFiles.value.map((file) => file.imageId) as string[];
+       return loadAndViewImage(imageIds);
+     })
      .catch((err) => console.error(err))
      .finally(() => {
        unzipLoading.value = false;
@@ -178,115 +186,121 @@ const fileNameSortPredicate = (fileName1: string, fileName2: string) => {
   return 0;
 }
 
-const loadAndViewImage = async (imageId: string) => {
+const loadAndViewImage = async (imageIds: string[]) => {
   if (!viewport.value) {
     return;
   }
 
-  await prefetchMetadataInformation([imageId]);
-  const stack = convertMultiframeImageIds([imageId]);
+  await prefetchMetadataInformation([...imageIds]);
+  stacks.value = convertMultiframeImageIds([...imageIds]);
 
   // @ts-ignore - Set the stack on the viewport
-  viewport.value.setStack(stack).then(() => {
-    // Set the VOI of the stack
-    // viewport.setProperties({ voiRange: ctVoiRange });
-    // Render the image
-    viewport.value!.render();
-
-    // @ts-ignore
-    const imageData = viewport.value!.getImageData();
-
-    const {
-      pixelRepresentation,
-      bitsAllocated,
-      bitsStored,
-      highBit,
-      photometricInterpretation,
-    } = metaData.get('imagePixelModule', imageId);
-
-    const voiLutModule = metaData.get('voiLutModule', imageId);
-
-    const sopCommonModule = metaData.get('sopCommonModule', imageId);
-    const transferSyntax = metaData.get('transferSyntax', imageId);
-
-    metadata.value.push({
-      info: 'transferSyntax',
-      value: transferSyntax.transferSyntaxUID,
-    });
-    metadata.value.push({
-      info: 'sopClassUID',
-      value: `${sopCommonModule.sopClassUID} [${uids[sopCommonModule.sopClassUID]}]`,
-    });
-    metadata.value.push({
-      info: 'sopInstanceUID',
-      value: sopCommonModule.sopInstanceUID,
-    });
-    metadata.value.push({
-      info: 'rows',
-      value: imageData.dimensions[0],
-    });
-    metadata.value.push({
-      info: 'columns',
-      value: imageData.dimensions[1],
-    });
-    metadata.value.push({
-      info: 'spacing',
-      value: imageData.spacing.join('\\'),
-    });
-    metadata.value.push({
-      info: 'direction',
-      value: imageData.direction
-                      .map((x: number) => Math.round(x * 100) / 100)
-                      .join(','),
-    });
-    metadata.value.push({
-      info: 'origin',
-      value: imageData.origin
-                      .map((x: number) => Math.round(x * 100) / 100)
-                      .join(','),
-    });
-    metadata.value.push({
-      info: 'modality',
-      value: imageData.metadata.Modality,
-    });
-    metadata.value.push({
-      info: 'pixelRepresentation',
-      value: pixelRepresentation,
-    });
-    metadata.value.push({
-      info: 'bitsAllocated',
-      value: bitsAllocated,
-    });
-    metadata.value.push({
-      info: 'bitsStored',
-      value: bitsStored,
-    });
-    metadata.value.push({
-      info: 'highBit',
-      value: highBit,
-    });
-    metadata.value.push({
-      info: 'photometricInterpretation',
-      value: photometricInterpretation,
-    });
-    metadata.value.push({
-      info: 'windowCenter',
-      value: voiLutModule.windowCenter,
-    });
-    metadata.value.push({
-      info: 'windowWidth',
-      value: voiLutModule.windowWidth,
-    });
+  viewport.value.setStack(stacks.value, 0).then((imageId: string) => {
+    setMetadata(imageId);
+    cornerstoneTools.utilities.stackPrefetch.enable(viewport.value?.element);
   });
 };
 
-const onClickFile = (file: UnzipFile) => {
-  if (!file.imageId) {
+const onClickFile = (index: number) => {
+  if (!viewport.value) {
     return;
   }
 
   metadata.value.length = 0;
-  loadAndViewImage(file.imageId);
+  // @ts-ignore
+  viewport.value.setStack(stacks.value, index).then(setMetadata);
+};
+
+const setMetadata = (imageId: string) => {
+  // Set the VOI of the stack
+  // viewport.setProperties({ voiRange: ctVoiRange });
+  // Render the image
+  viewport.value!.render();
+
+  // @ts-ignore
+  const imageData = viewport.value!.getImageData();
+
+  const {
+    pixelRepresentation,
+    bitsAllocated,
+    bitsStored,
+    highBit,
+    photometricInterpretation,
+  } = metaData.get('imagePixelModule', imageId);
+
+  const voiLutModule = metaData.get('voiLutModule', imageId);
+
+  const sopCommonModule = metaData.get('sopCommonModule', imageId);
+  const transferSyntax = metaData.get('transferSyntax', imageId);
+
+  metadata.value.push({
+    info: 'transferSyntax',
+    value: transferSyntax.transferSyntaxUID,
+  });
+  metadata.value.push({
+    info: 'sopClassUID',
+    value: `${sopCommonModule.sopClassUID} [${uids[sopCommonModule.sopClassUID]}]`,
+  });
+  metadata.value.push({
+    info: 'sopInstanceUID',
+    value: sopCommonModule.sopInstanceUID,
+  });
+  metadata.value.push({
+    info: 'rows',
+    value: imageData.dimensions[0],
+  });
+  metadata.value.push({
+    info: 'columns',
+    value: imageData.dimensions[1],
+  });
+  metadata.value.push({
+    info: 'spacing',
+    value: imageData.spacing.join('\\'),
+  });
+  metadata.value.push({
+    info: 'direction',
+    value: imageData.direction
+                    .map((x: number) => Math.round(x * 100) / 100)
+                    .join(','),
+  });
+  metadata.value.push({
+    info: 'origin',
+    value: imageData.origin
+                    .map((x: number) => Math.round(x * 100) / 100)
+                    .join(','),
+  });
+  metadata.value.push({
+    info: 'modality',
+    value: imageData.metadata.Modality,
+  });
+  metadata.value.push({
+    info: 'pixelRepresentation',
+    value: pixelRepresentation,
+  });
+  metadata.value.push({
+    info: 'bitsAllocated',
+    value: bitsAllocated,
+  });
+  metadata.value.push({
+    info: 'bitsStored',
+    value: bitsStored,
+  });
+  metadata.value.push({
+    info: 'highBit',
+    value: highBit,
+  });
+  metadata.value.push({
+    info: 'photometricInterpretation',
+    value: photometricInterpretation,
+  });
+  metadata.value.push({
+    info: 'windowCenter',
+    value: voiLutModule.windowCenter,
+  });
+  metadata.value.push({
+    info: 'windowWidth',
+    value: voiLutModule.windowWidth,
+  });
 };
 
 onMounted(run);
@@ -296,7 +310,7 @@ onUnmounted(() => {
   ToolGroupManager.destroyToolGroup(toolGroupId);
   cornerstoneTools.destroy();
   renderingEngine.destroy();
-})
+});
 </script>
 
 <template>
@@ -341,9 +355,9 @@ onUnmounted(() => {
       <ul v-show="!unzipLoading">
         <li
           :class="getListClass"
-          v-for="file in uploadedFiles"
+          v-for="(file, index) in uploadedFiles"
           :key="file.name"
-          @click="onClickFile(file)"
+          @click="onClickFile(index)"
         >
           {{file.name}}
         </li>

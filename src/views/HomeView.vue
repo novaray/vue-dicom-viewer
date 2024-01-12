@@ -24,7 +24,7 @@ const tabs = {
   'Scroll_Volume': TestScrollVolumeComponent
 };
 
-const currentComponent = ref(TestScrollVolumeComponent);
+const currentComponent = ref(TestUnzipFileComponent);
 
 const onClickTab = (tab: any) => {
   currentComponent.value = tab;
