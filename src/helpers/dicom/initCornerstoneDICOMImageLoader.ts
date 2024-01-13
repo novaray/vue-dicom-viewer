@@ -20,23 +20,23 @@ export default function initCornerstoneDICOMImageLoader() {
       use16BitDataType: preferSizeOverAccuracy || useNorm16Texture,
     },
   });
-  
-  let maxWebWorkers = 1;
-  
-  if (navigator.hardwareConcurrency) {
-    maxWebWorkers = Math.min(navigator.hardwareConcurrency, 7);
-  }
-  
-  let config = {
-    maxWebWorkers,
-    startWebWorkersOnDemand: false,
-    taskConfiguration: {
-      decodeTask: {
-        initializeCodecsOnStartup: false,
-        strict: false,
-      },
-    },
-  };
-  
-  cornerstoneDICOMImageLoader.webWorkerManager.initialize(config);
+
+  // let maxWebWorkers = 1;
+  //
+  // if (navigator.hardwareConcurrency) {
+  //   maxWebWorkers = Math.min(navigator.hardwareConcurrency, 7);
+  // }
+  //
+  // let config = {
+  //   maxWebWorkers,
+  //   startWebWorkersOnDemand: false,
+  //   taskConfiguration: {
+  //     decodeTask: {
+  //       initializeCodecsOnStartup: false,
+  //       strict: false,
+  //     },
+  //   },
+  // };
+  //
+  // cornerstoneDICOMImageLoader.webWorkerManager.initialize(config);
 }

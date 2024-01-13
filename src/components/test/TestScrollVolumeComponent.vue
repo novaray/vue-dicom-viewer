@@ -6,9 +6,6 @@ import { ViewportType } from '@cornerstonejs/core/src/enums';
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
-import initDicom from '@/helpers/dicom/initDicom';
-
-await initDicom();
 
 const {
   ToolGroupManager,

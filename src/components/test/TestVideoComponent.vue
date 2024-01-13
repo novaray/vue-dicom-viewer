@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue';
 import { Enums, getRenderingEngine, RenderingEngine, type Types } from '@cornerstonejs/core';
 import addButtonToToolbar from '@/helpers/dicom/addButtonToToolbar';
-import initDicom from '@/helpers/dicom/initDicom';
 import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
 
 const {ViewportType, Events} = Enums;
@@ -90,7 +89,6 @@ onMounted( () => {
 
   async function run() {
     // Init Cornerstone and related libraries
-    await initDicom();
 
     // Get Cornerstone imageIds and fetch metadata into RAM
     const imageIds = await createImageIdsAndCacheMetaData({

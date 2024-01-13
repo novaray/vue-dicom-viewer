@@ -3,9 +3,6 @@ import { onMounted, ref } from 'vue';
 import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
 import { Enums, RenderingEngine, setVolumesForViewports, volumeLoader } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
-import initDicom from '@/helpers/dicom/initDicom';
-
-await initDicom();
 
 const divTag = ref<HTMLDivElement | null>(null);
 
