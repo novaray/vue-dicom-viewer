@@ -1,25 +1,25 @@
 import dicomParser from 'dicom-parser';
 import * as cornerstone from '@cornerstonejs/core';
-import * as cornerstoneTools from '@cornerstonejs/tools';
+// import * as cornerstoneTools from '@cornerstonejs/tools';
 import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
 
 // @ts-ignore
-window.cornerstone = cornerstone;
+// window.cornerstone = cornerstone;
 // @ts-ignore
-window.cornerstoneTools = cornerstoneTools;
-const { preferSizeOverAccuracy, useNorm16Texture } =
-  cornerstone.getConfiguration().rendering;
+// window.cornerstoneTools = cornerstoneTools;
+// const { preferSizeOverAccuracy, useNorm16Texture } =
+//   cornerstone.getConfiguration().rendering;
 
 export default function initCornerstoneDICOMImageLoader() {
   cornerstoneDICOMImageLoader.external.cornerstone = cornerstone;
   cornerstoneDICOMImageLoader.external.dicomParser = dicomParser;
-  cornerstoneDICOMImageLoader.configure({
-    useWebWorkers: true,
-    decodeConfig: {
-      convertFloatPixelDataToInt: false,
-      use16BitDataType: preferSizeOverAccuracy || useNorm16Texture,
-    },
-  });
+  // cornerstoneDICOMImageLoader.configure({
+  //   useWebWorkers: true,
+  //   decodeConfig: {
+  //     convertFloatPixelDataToInt: false,
+  //     use16BitDataType: preferSizeOverAccuracy || useNorm16Texture,
+  //   },
+  // });
 
   // let maxWebWorkers = 1;
   //
