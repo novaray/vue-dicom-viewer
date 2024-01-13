@@ -11,8 +11,8 @@ export default defineConfig({
     cp({
       targets: [
         {
-          src: "node_modules/@cornerstonejs/dicom-image-loader/dist/dynamic-import/*",
-          dest: "dist",
+          src: 'node_modules/@cornerstonejs/dicom-image-loader/dist/dynamic-import/*',
+          dest: 'dist'
         },
       ],
     })
@@ -25,7 +25,7 @@ export default defineConfig({
   server: {
     headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',
-      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Opener-Policy': 'same-origin'
     }
   }
 });
