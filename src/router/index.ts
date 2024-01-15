@@ -34,6 +34,11 @@ const router = createRouter({
           name: 'manipulationTools',
           component: () => import('../views/example/ExampleManipulationToolsView.vue')
         },
+        {
+          path: '/video',
+          name: 'video',
+          component: () => import('../views/example/ExampleVideoView.vue')
+        },
       ]
     }
   ]

@@ -141,7 +141,3 @@ onMounted( () => {
   <div id="demo-toolbar"/>
   <div ref="divTag"/>
 </template>
-
-<style scoped lang="scss">
-
-</style>
