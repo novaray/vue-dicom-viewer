@@ -13,6 +13,7 @@ const tabs = {
   'localFile': 'Local File',
   'localFileWithTools': 'Local File With Tools',
   'unzipFile': 'Unzip File',
+  'manipulationTools': 'Manipulation Tools'
 };
 
 const onClickTab = (name: any) => {

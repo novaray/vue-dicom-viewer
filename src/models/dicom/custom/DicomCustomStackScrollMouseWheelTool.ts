@@ -4,8 +4,8 @@ import type { MouseWheelEventType } from '@cornerstonejs/tools/dist/cjs/types/Ev
 import { scroll } from '@cornerstonejs/tools/dist/cjs/utilities';
 
 /**
- * The StackScrollMouseWheelTool is a tool that allows the user to scroll through a
- * stack of images using the mouse wheel
+ * The StackScrollMouseWheelTool is a tool that allows the user to scroll through a stack of images using the mouse wheel
+ * Warning: 사용하지 말 것. StackScrollMouseWheelTool과 같은 구조이나 vite에서 번들링시에 제대로 말아지지 않음.
  */
 class DicomCustomStackScrollMouseWheelTool extends BaseTool {
   static toolName: string;

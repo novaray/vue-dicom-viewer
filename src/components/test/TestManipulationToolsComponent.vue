@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
-import { RenderingEngine } from '@cornerstonejs/core';
+import { cache, RenderingEngine } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
-import { addTool, ToolGroupManager, WindowLevelTool, ZoomTool } from '@cornerstonejs/tools';
+import { addTool, ToolGroupManager, WindowLevelTool, ZoomTool, removeTool } from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const divTag = ref<HTMLDivElement | null>(null);
+const toolGroupId = 'manipulationToolGroup';
+const toolGroup = reactive(ToolGroupManager.createToolGroup(toolGroupId) as IToolGroup);
+const renderingEngineId = 'manipulationRenderingEngine';
+const renderingEngine = reactive(new RenderingEngine(renderingEngineId));
 
 onMounted(async () => {
   // Get Cornerstone imageIds and fetch metadata into RAM
@@ -29,9 +34,6 @@ onMounted(async () => {
 
   content!.appendChild(element);
 
-  const renderingEngineId = 'myRenderingEngine';
-  const renderingEngine = new RenderingEngine(renderingEngineId);
-
   const viewportId = 'CT_AXIAL_STACK';
 
   const viewportInput = {
@@ -51,9 +53,6 @@ onMounted(async () => {
 
   addTool(ZoomTool);
   addTool(WindowLevelTool);
-
-  const toolGroupId = 'myToolGroup';
-  const toolGroup = ToolGroupManager.createToolGroup(toolGroupId) as IToolGroup;
 
   // Add tools to the ToolGroup
   toolGroup.addTool(ZoomTool.toolName);
@@ -77,6 +76,14 @@ onMounted(async () => {
       },
     ],
   });
+});
+
+onBeforeRouteLeave(() => {
+  cache.purgeCache();
+  ToolGroupManager.destroyToolGroup(toolGroupId);
+  removeTool(ZoomTool);
+  removeTool(WindowLevelTool);
+  renderingEngine.destroy();
 });
 </script>
 

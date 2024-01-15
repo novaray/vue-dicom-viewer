@@ -29,6 +29,11 @@ const router = createRouter({
           name: 'unzipFile',
           component: () => import('../views/example/ExampleUnzipFileView.vue')
         },
+        {
+          path: '/manipulation-tools',
+          name: 'manipulationTools',
+          component: () => import('../views/example/ExampleManipulationToolsView.vue')
+        },
       ]
     }
   ]

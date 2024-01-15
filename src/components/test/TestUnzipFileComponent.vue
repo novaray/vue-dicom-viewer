@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
+import { wadouri } from '@cornerstonejs/dicom-image-loader';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
-import * as cornerstoneTools from '@cornerstonejs/tools';
+import { convertMultiframeImageIds } from '@/helpers/dicom/convertMultiframeImageIds';
+import {
+  addTool, PanTool, removeTool, StackScrollMouseWheelTool, ToolGroupManager, utilities, WindowLevelTool, ZoomTool
+} from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
-import { cache, metaData, RenderingEngine, type Types } from '@cornerstonejs/core';
+import { cache, RenderingEngine, type Types } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
-import { uids } from '@/models/dicom/uids';
 import JSZip from 'jszip';
 import CommonLoadingSpinner from '@/components/common/CommonLoadingSpinner.vue';
-import DicomCustomStackScrollMouseWheelTool from '@/models/dicom/custom/DicomCustomStackScrollMouseWheelTool';
 import { onBeforeRouteLeave } from 'vue-router';
 
 interface UnzipFile {
@@ -20,19 +20,13 @@ interface UnzipFile {
 
 const zip = new JSZip();
 
-const {
-  PanTool,
-  WindowLevelTool,
-  ZoomTool,
-  ToolGroupManager,
-} = cornerstoneTools;
-const toolGroupId = 'myToolGroup';
+const toolGroupId = 'unzipToolGroup';
 
 const divTag = ref<HTMLDivElement | null>(null);
 const viewport = ref<Types.IViewport>();
 
 // Instantiate a rendering engine
-const renderingEngineId = 'myRenderingEngine';
+const renderingEngineId = 'unzipRenderingEngine';
 const renderingEngine = reactive(new RenderingEngine(renderingEngineId));
 
 const metadata = ref<{
@@ -57,10 +51,10 @@ const run = async () => {
 
   content!.appendChild(element);
 
-  cornerstoneTools.addTool(PanTool);
-  cornerstoneTools.addTool(WindowLevelTool);
-  cornerstoneTools.addTool(DicomCustomStackScrollMouseWheelTool);
-  cornerstoneTools.addTool(ZoomTool);
+  addTool(PanTool);
+  addTool(WindowLevelTool);
+  addTool(StackScrollMouseWheelTool);
+  addTool(ZoomTool);
 
   // Define a tool group, which defines how mouse events map to tool commands for
   // Any viewport using the group
@@ -70,7 +64,7 @@ const run = async () => {
   toolGroup.addTool(WindowLevelTool.toolName);
   toolGroup.addTool(PanTool.toolName);
   toolGroup.addTool(ZoomTool.toolName);
-  toolGroup.addTool(DicomCustomStackScrollMouseWheelTool.toolName);
+  toolGroup.addTool(StackScrollMouseWheelTool.toolName);
 
   // Set the initial state of the tools, here all tools are active and bound to
   // Different mouse inputs
@@ -97,7 +91,7 @@ const run = async () => {
   });
   // As the Stack Scroll mouse wheel is a tool using the `mouseWheelCallback`
   // hook instead of mouse buttons, it does not need to assign any mouse button.
-  toolGroup.setToolActive(DicomCustomStackScrollMouseWheelTool.toolName);
+  toolGroup.setToolActive(StackScrollMouseWheelTool.toolName);
 
   // Create a stack viewport
   const viewportId = 'CT_STACK_UNZIP';
@@ -144,7 +138,7 @@ const onChangeFile = (event: Event) => {
        const promises = files.map((zipEntry) => {
          return zipEntry.async('blob')
                         .then((blob: Blob) => {
-                          const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(blob);
+                          const imageId = wadouri.fileManager.add(blob);
                           return {
                             name: zipEntry.name,
                             imageId
@@ -182,20 +176,19 @@ const fileNameSortPredicate = (fileName1: string, fileName2: string) => {
   }
 
   return 0;
-}
+};
 
-const loadAndViewImage = async (imageIds: string[]) => {
+const loadAndViewImage = (imageIds: string[]) => {
   if (!viewport.value) {
     return;
   }
 
-  await prefetchMetadataInformation([...imageIds]);
   stacks.value = convertMultiframeImageIds([...imageIds]);
 
   // @ts-ignore - Set the stack on the viewport
   viewport.value.setStack(stacks.value, 0).then((imageId: string) => {
-    setMetadata(imageId);
-    cornerstoneTools.utilities.stackPrefetch.enable(viewport.value?.element);
+    viewport.value!.render();
+    utilities.stackPrefetch.enable(viewport.value?.element);
   });
 };
 
@@ -206,99 +199,7 @@ const onClickFile = (index: number) => {
 
   metadata.value.length = 0;
   // @ts-ignore
-  viewport.value.setStack(stacks.value, index).then(setMetadata);
-};
-
-const setMetadata = (imageId: string) => {
-  // Set the VOI of the stack
-  // viewport.setProperties({ voiRange: ctVoiRange });
-  // Render the image
-  viewport.value!.render();
-
-  // @ts-ignore
-  const imageData = viewport.value!.getImageData();
-
-  const {
-    pixelRepresentation,
-    bitsAllocated,
-    bitsStored,
-    highBit,
-    photometricInterpretation,
-  } = metaData.get('imagePixelModule', imageId);
-
-  const voiLutModule = metaData.get('voiLutModule', imageId);
-
-  const sopCommonModule = metaData.get('sopCommonModule', imageId);
-  const transferSyntax = metaData.get('transferSyntax', imageId);
-
-  metadata.value.push({
-    info: 'transferSyntax',
-    value: transferSyntax.transferSyntaxUID,
-  });
-  metadata.value.push({
-    info: 'sopClassUID',
-    value: `${sopCommonModule.sopClassUID} [${uids[sopCommonModule.sopClassUID]}]`,
-  });
-  metadata.value.push({
-    info: 'sopInstanceUID',
-    value: sopCommonModule.sopInstanceUID,
-  });
-  metadata.value.push({
-    info: 'rows',
-    value: imageData.dimensions[0],
-  });
-  metadata.value.push({
-    info: 'columns',
-    value: imageData.dimensions[1],
-  });
-  metadata.value.push({
-    info: 'spacing',
-    value: imageData.spacing.join('\\'),
-  });
-  metadata.value.push({
-    info: 'direction',
-    value: imageData.direction
-                    .map((x: number) => Math.round(x * 100) / 100)
-                    .join(','),
-  });
-  metadata.value.push({
-    info: 'origin',
-    value: imageData.origin
-                    .map((x: number) => Math.round(x * 100) / 100)
-                    .join(','),
-  });
-  metadata.value.push({
-    info: 'modality',
-    value: imageData.metadata.Modality,
-  });
-  metadata.value.push({
-    info: 'pixelRepresentation',
-    value: pixelRepresentation,
-  });
-  metadata.value.push({
-    info: 'bitsAllocated',
-    value: bitsAllocated,
-  });
-  metadata.value.push({
-    info: 'bitsStored',
-    value: bitsStored,
-  });
-  metadata.value.push({
-    info: 'highBit',
-    value: highBit,
-  });
-  metadata.value.push({
-    info: 'photometricInterpretation',
-    value: photometricInterpretation,
-  });
-  metadata.value.push({
-    info: 'windowCenter',
-    value: voiLutModule.windowCenter,
-  });
-  metadata.value.push({
-    info: 'windowWidth',
-    value: voiLutModule.windowWidth,
-  });
+  viewport.value.setStack(stacks.value, index).then(() => viewport.value!.render());
 };
 
 onMounted(run);
@@ -306,10 +207,10 @@ onMounted(run);
 onBeforeRouteLeave(() => {
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  cornerstoneTools.removeTool(PanTool);
-  cornerstoneTools.removeTool(WindowLevelTool);
-  cornerstoneTools.removeTool(DicomCustomStackScrollMouseWheelTool);
-  cornerstoneTools.removeTool(ZoomTool);
+  removeTool(PanTool);
+  removeTool(WindowLevelTool);
+  removeTool(StackScrollMouseWheelTool);
+  removeTool(ZoomTool);
   renderingEngine.destroy();
 });
 </script>
@@ -325,29 +226,6 @@ onBeforeRouteLeave(() => {
       />
       <div ref="divTag"/>
     </div>
-    <div class="table-wrap">
-      <table>
-        <colgroup>
-          <col :style="{width: '220px'}"/>
-          <col :style="{width: '500px'}"/>
-        </colgroup>
-        <thead>
-          <tr>
-            <th>info</th>
-            <th>value</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="item in metadata"
-            :key="item.info"
-          >
-            <td>{{ item.info }}</td>
-            <td>{{ item.value }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
     <div class="file-list-wrap">
       <CommonLoadingSpinner
         v-show="isLoading"
@@ -360,7 +238,7 @@ onBeforeRouteLeave(() => {
           :key="file.name"
           @click="onClickFile(index)"
         >
-          {{file.name}}
+          {{ file.name }}
         </li>
       </ul>
     </div>
@@ -378,10 +256,6 @@ onBeforeRouteLeave(() => {
   margin: 1rem;
   gap: 0.6rem;
   min-height: 800px;
-}
-
-.table-wrap {
-  margin-top: 3rem;
 }
 
 .file-list-wrap {

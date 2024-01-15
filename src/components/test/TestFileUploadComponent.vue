@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
+import { wadouri } from '@cornerstonejs/dicom-image-loader';
 import { onMounted, reactive, ref } from 'vue';
 import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
-import * as cornerstoneTools from '@cornerstonejs/tools';
+import { PanTool, StackScrollMouseWheelTool, ToolGroupManager, WindowLevelTool, ZoomTool, addTool, removeTool } from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
 import { cache, metaData, RenderingEngine, type Types } from '@cornerstonejs/core';
@@ -10,13 +10,6 @@ import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
 import { onBeforeRouteLeave } from 'vue-router';
 
-const {
-  PanTool,
-  WindowLevelTool,
-  StackScrollMouseWheelTool,
-  ZoomTool,
-  ToolGroupManager,
-} = cornerstoneTools;
 const toolGroupId = 'ToolGroup_FileBasic';
 
 const divTag = ref<HTMLDivElement | null>(null);
@@ -38,10 +31,10 @@ const run = async () => {
 
   content!.appendChild(element);
 
-  cornerstoneTools.addTool(PanTool);
-  cornerstoneTools.addTool(WindowLevelTool);
-  cornerstoneTools.addTool(StackScrollMouseWheelTool);
-  cornerstoneTools.addTool(ZoomTool);
+  addTool(PanTool);
+  addTool(WindowLevelTool);
+  addTool(StackScrollMouseWheelTool);
+  addTool(ZoomTool);
 
   // Define a tool group, which defines how mouse events map to tool commands for
   // Any viewport using the group
@@ -107,7 +100,7 @@ const onChangeFile = (event: Event) => {
 
   metadata.length = 0;
   const file = files[0];
-  const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(file);
+  const imageId = wadouri.fileManager.add(file);
   loadAndViewImage(imageId);
 };
 
@@ -218,10 +211,10 @@ onMounted(run);
 onBeforeRouteLeave(() => {
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  cornerstoneTools.removeTool(PanTool);
-  cornerstoneTools.removeTool(WindowLevelTool);
-  cornerstoneTools.removeTool(StackScrollMouseWheelTool);
-  cornerstoneTools.removeTool(ZoomTool);
+  removeTool(PanTool);
+  removeTool(WindowLevelTool);
+  removeTool(StackScrollMouseWheelTool);
+  removeTool(ZoomTool);
   renderingEngine.destroy();
 });
 </script>

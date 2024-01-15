@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
 import { cache, Enums, RenderingEngine, setVolumesForViewports, type Types, volumeLoader } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
-import * as cornerstoneTools from '@cornerstonejs/tools';
+import {
+  addTool, PanTool, ReferenceLines, removeTool, StackScrollMouseWheelTool, ToolGroupManager, WindowLevelTool, ZoomTool
+} from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
-
-const {
-  ToolGroupManager,
-  StackScrollMouseWheelTool,
-  ZoomTool,
-  ReferenceLines,
-  PanTool,
-  Enums: csToolsEnums,
-  WindowLevelTool,
-} = cornerstoneTools;
 
 // Define a unique id for the volume
 const volumeName = 'CT_VOLUME_ID_SCROLL'; // id of the volume less loader prefix
@@ -64,11 +56,11 @@ const run = async () => {
   content!.appendChild(viewportGrid);
 
   // Add tools to Cornerstone3D
-  cornerstoneTools.addTool(WindowLevelTool);
-  cornerstoneTools.addTool(ReferenceLines);
-  cornerstoneTools.addTool(PanTool);
-  cornerstoneTools.addTool(ZoomTool);
-  cornerstoneTools.addTool(StackScrollMouseWheelTool);
+  addTool(WindowLevelTool);
+  addTool(ReferenceLines);
+  addTool(PanTool);
+  addTool(ZoomTool);
+  addTool(StackScrollMouseWheelTool);
 
   // Add the tools to the tool group and specify which volume they are pointing at
   toolGroup.addTool(WindowLevelTool.toolName, {volumeId});
@@ -178,7 +170,11 @@ onMounted(run);
 onUnmounted(() => {
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  cornerstoneTools.destroy();
+  removeTool(WindowLevelTool);
+  removeTool(ReferenceLines);
+  removeTool(PanTool);
+  removeTool(ZoomTool);
+  removeTool(StackScrollMouseWheelTool);
   renderingEngine.destroy();
 });
 </script>

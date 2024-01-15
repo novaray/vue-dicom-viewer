@@ -1,27 +1,19 @@
 <script setup lang="ts">
-import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
+import { wadouri } from '@cornerstonejs/dicom-image-loader';
 import { onMounted, reactive, ref } from 'vue';
 import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
-import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';
-import { metaData, RenderingEngine, type Types, cache } from '@cornerstonejs/core';
+import { cache, metaData, RenderingEngine, type Types } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { uids } from '@/models/dicom/uids';
 import { onBeforeRouteLeave } from 'vue-router';
+import {
+  addTool,
+  AngleTool, ArrowAnnotateTool, BidirectionalTool, CircleROITool, EllipticalROITool, LengthTool, ProbeTool, RectangleROITool, removeTool,
+  ToolGroupManager
+} from '@cornerstonejs/tools';
 
-const {
-  LengthTool,
-  ProbeTool,
-  RectangleROITool,
-  EllipticalROITool,
-  CircleROITool,
-  BidirectionalTool,
-  AngleTool,
-  ToolGroupManager,
-  ArrowAnnotateTool,
-  Enums: csToolsEnums,
-} = cornerstoneTools;
 const toolsNames = [
   LengthTool.toolName,
   ProbeTool.toolName,
@@ -57,14 +49,14 @@ const run = async () => {
   content!.appendChild(element);
 
   // Add tools to Cornerstone3D
-  cornerstoneTools.addTool(LengthTool);
-  cornerstoneTools.addTool(ProbeTool);
-  cornerstoneTools.addTool(RectangleROITool);
-  cornerstoneTools.addTool(EllipticalROITool);
-  cornerstoneTools.addTool(CircleROITool);
-  cornerstoneTools.addTool(BidirectionalTool);
-  cornerstoneTools.addTool(AngleTool);
-  cornerstoneTools.addTool(ArrowAnnotateTool);
+  addTool(LengthTool);
+  addTool(ProbeTool);
+  addTool(RectangleROITool);
+  addTool(EllipticalROITool);
+  addTool(CircleROITool);
+  addTool(BidirectionalTool);
+  addTool(AngleTool);
+  addTool(ArrowAnnotateTool);
 
   // Define a tool group, which defines how mouse events map to tool commands for
   // Any viewport using the group
@@ -127,7 +119,7 @@ const onChangeFile = (event: Event) => {
 
   metadata.length = 0;
   const file = files[0];
-  const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(file);
+  const imageId = wadouri.fileManager.add(file);
   loadAndViewImage(imageId);
 };
 
@@ -258,14 +250,14 @@ onMounted(run);
 onBeforeRouteLeave(() => {
   cache.purgeCache();
   ToolGroupManager.destroyToolGroup(toolGroupId);
-  cornerstoneTools.removeTool(LengthTool);
-  cornerstoneTools.removeTool(ProbeTool);
-  cornerstoneTools.removeTool(RectangleROITool);
-  cornerstoneTools.removeTool(EllipticalROITool);
-  cornerstoneTools.removeTool(CircleROITool);
-  cornerstoneTools.removeTool(BidirectionalTool);
-  cornerstoneTools.removeTool(AngleTool);
-  cornerstoneTools.removeTool(ArrowAnnotateTool);
+  removeTool(LengthTool);
+  removeTool(ProbeTool);
+  removeTool(RectangleROITool);
+  removeTool(EllipticalROITool);
+  removeTool(CircleROITool);
+  removeTool(BidirectionalTool);
+  removeTool(AngleTool);
+  removeTool(ArrowAnnotateTool);
   renderingEngine.destroy();
 });
 </script>
@@ -281,7 +273,7 @@ onBeforeRouteLeave(() => {
           v-for="toolName in toolsNames"
           :key="toolName"
         >
-          {{toolName}}
+          {{ toolName }}
         </option>
       </select>
       <input
