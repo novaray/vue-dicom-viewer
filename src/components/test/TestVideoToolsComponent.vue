@@ -39,7 +39,6 @@ const renderingEngine = reactive(new RenderingEngine(renderingEngineId));
 
 const selectedToolName = ref<string>(toolsNames[0]);
 const viewport = ref<Types.IVideoViewport>();
-const demoToolbarTag = ref<HTMLDivElement | null>(null);
 const divTag = ref<HTMLDivElement | null>(null);
 const toggle = ref(true);
 
@@ -60,7 +59,7 @@ const run = async (element: HTMLDivElement) => {
     (it: string) => it.indexOf('2.25.179478223177027022014772769075050874231') !== -1
   );
 
-  addAnnotationListeners();
+  // addAnnotationListeners();
 
   // Add annotation tools to Cornerstone3D
   addTool(KeyImageTool);
@@ -234,7 +233,7 @@ onBeforeRouteLeave(() => {
 
   // TODO destory가 에러를 뱉어내서 잠시 주석. 다음 링크에서 답변 온다면 확인할 것.
   // https://github.com/cornerstonejs/cornerstone3D/issues/1001
-  renderingEngine?.destroy();
+  // renderingEngine?.destroy();
 });
 </script>
 
@@ -254,7 +253,6 @@ onBeforeRouteLeave(() => {
     <button @click="onTogglePlay(!toggle)">
       {{ getToggleText }}
     </button>
-    <div ref="demoToolbarTag"/>
     <div ref="divTag"/>
   </div>
 </template>
