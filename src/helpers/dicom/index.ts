@@ -9,3 +9,4 @@ export * from './initProviders';
 export * from './ptScalingMetaDataProvider';
 export * from './removeInvalidTags';
 export * from './setTitleAndDescription';
+export * from './addManipulationBindings';

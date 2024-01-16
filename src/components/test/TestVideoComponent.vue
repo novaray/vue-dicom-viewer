@@ -8,6 +8,7 @@ const {ViewportType, Events} = Enums;
 const renderingEngineId = 'myRenderingEngine';
 const viewportId = 'videoViewport';
 
+const demoToolbarTag = ref<HTMLDivElement | null>(null);
 const divTag = ref<HTMLDivElement | null>(null);
 
 onMounted( () => {
@@ -55,6 +56,7 @@ onMounted( () => {
   addButtonToToolbar({
     id: 'play-button',
     title: 'Play',
+    container: demoToolbarTag.value!,
     onClick: () => {
       // Get the rendering engine
       const renderingEngine = getRenderingEngine(renderingEngineId);
@@ -72,6 +74,7 @@ onMounted( () => {
   addButtonToToolbar({
     id: 'pause-button',
     title: 'Pause',
+    container: demoToolbarTag.value!,
     onClick: () => {
       // Get the rendering engine
       const renderingEngine = getRenderingEngine(renderingEngineId);
@@ -137,6 +140,6 @@ onMounted( () => {
 </script>
 
 <template>
-  <div id="demo-toolbar"/>
+  <div ref="demoToolbarTag"/>
   <div ref="divTag"/>
 </template>

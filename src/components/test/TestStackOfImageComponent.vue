@@ -41,6 +41,7 @@ onMounted(async () => {
   viewport.setStack(imageIds, 60);
 
   viewport.render();
+  console.log(viewport.get);
 });
 
 onBeforeRouteLeave(() => {

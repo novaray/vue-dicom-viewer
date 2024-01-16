@@ -39,6 +39,11 @@ const router = createRouter({
           name: 'video',
           component: () => import('../views/example/ExampleVideoView.vue')
         },
+        {
+          path: '/video-with-tools',
+          name: 'videoTools',
+          component: () => import('../views/example/ExampleVideoToolsView.vue')
+        },
       ]
     }
   ]
