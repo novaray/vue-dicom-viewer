@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
-import { cache, Enums, eventTarget, RenderingEngine, type Types } from '@cornerstonejs/core';
+import { cache, Enums, RenderingEngine, type Types } from '@cornerstonejs/core';
 import { addManipulationBindings, createImageIdsAndCacheMetaData } from '@/helpers/dicom';
 import {
   addTool, AngleTool, ArrowAnnotateTool, BidirectionalTool, CircleROITool, CobbAngleTool, EllipticalROITool, Enums as csToolsEnums,
   KeyImageTool, LengthTool, LivewireContourTool, PanTool, PlanarFreehandROITool, ProbeTool, RectangleROITool, removeTool,
   StackScrollMouseWheelTool, StackScrollTool,
   ToolGroupManager,
-  VideoRedactionTool, ZoomTool,
+  VideoRedactionTool, ZoomTool
 } from '@cornerstonejs/tools';
-import { annotationModifiedListener } from '@cornerstonejs/tools/dist/cjs/eventListeners';
+// import { annotationModifiedListener } from '@cornerstonejs/tools/dist/cjs/eventListeners';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { onBeforeRouteLeave } from 'vue-router';
 
@@ -41,6 +41,11 @@ const selectedToolName = ref<string>(toolsNames[0]);
 const viewport = ref<Types.IVideoViewport>();
 const divTag = ref<HTMLDivElement | null>(null);
 const toggle = ref(true);
+
+const currentTime = ref('0s');
+const remainingTime = ref('0s');
+const range = ref(0);
+const rangeMax = ref(100);
 
 const getToggleText = computed(() => toggle.value ? 'Play' : 'Pause');
 
@@ -128,22 +133,33 @@ const run = async (element: HTMLDivElement) => {
 
   // Set the stack on the viewport
   await viewport.value.setVideo(videoId);
+
+  const seconds = (time: number) => `${Math.round(time * 10) / 10} s`;
+
+  element.addEventListener(Enums.Events.IMAGE_RENDERED, (evt: any) => {
+    const { time, duration } = evt.detail;
+    range.value = time;
+    rangeMax.value = duration;
+    currentTime.value = seconds(time);
+    remainingTime.value = seconds(duration - time);
+  });
 };
 
-const addAnnotationListeners = () => {
-  eventTarget.addEventListener(
-    toolsEvents.ANNOTATION_SELECTION_CHANGE,
-    annotationModifiedListener
-  );
-  eventTarget.addEventListener(
-    toolsEvents.ANNOTATION_MODIFIED,
-    annotationModifiedListener
-  );
-  eventTarget.addEventListener(
-    toolsEvents.ANNOTATION_COMPLETED,
-    annotationModifiedListener
-  );
-};
+// TODO 배포시에 문제되서 추후 확인.
+// const addAnnotationListeners = () => {
+//   eventTarget.addEventListener(
+//     toolsEvents.ANNOTATION_SELECTION_CHANGE,
+//     annotationModifiedListener
+//   );
+//   eventTarget.addEventListener(
+//     toolsEvents.ANNOTATION_MODIFIED,
+//     annotationModifiedListener
+//   );
+//   eventTarget.addEventListener(
+//     toolsEvents.ANNOTATION_COMPLETED,
+//     annotationModifiedListener
+//   );
+// };
 
 const onSelectChange = (event: Event) => {
   const newToolName = (event.target as HTMLSelectElement).value;
@@ -168,6 +184,16 @@ const onSelectChange = (event: Event) => {
 const onTogglePlay = (newToggle: boolean) => {
   newToggle ? viewport.value!.pause() : viewport.value!.play();
   toggle.value = newToggle;
+};
+
+const onChangeRange = () => {
+  // @ts-ignore
+  viewport.value?.setTime(+range.value);
+};
+
+const onInputRange = () => {
+  // @ts-ignore
+  viewport.value?.setTime(+range.value);
 };
 
 onMounted(() => {
@@ -254,5 +280,22 @@ onBeforeRouteLeave(() => {
       {{ getToggleText }}
     </button>
     <div ref="divTag"/>
+    <div
+      id="time"
+      style="float:left;width:2.5em;"
+    >
+      {{currentTime}}
+    </div>
+    <input
+      style="width:400px;height:8px;float: left"
+      type="range"
+      v-model="range"
+      @change="onChangeRange"
+      @input="onInputRange"
+      :max="rangeMax"
+    />
+    <div>
+      {{remainingTime}}
+    </div>
   </div>
 </template>
