@@ -1,11 +1,14 @@
 import {metaData, utilities} from '@cornerstonejs/core';
-import ptScalingMetaDataProvider from './ptScalingMetaDataProvider';
+import { get, addInstance } from './ptScalingMetaDataProvider';
 
 const { calibratedPixelSpacingMetadataProvider } = utilities;
 
-export default function initProviders() {
+export function initProviders() {
   metaData.addProvider(
-    ptScalingMetaDataProvider.get.bind(ptScalingMetaDataProvider),
+    get.bind({
+      addInstance,
+      get
+    }),
     10000
   );
   metaData.addProvider(

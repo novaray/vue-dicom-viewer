@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import initDicom from '@/helpers/dicom/initDicom';
+import { initDicom } from '@/helpers/dicom';
 
 const router = useRouter();
 

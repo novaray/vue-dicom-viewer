@@ -1,4 +1,4 @@
-export default function getPixelSpacingInformation(instance: any) {
+export function getPixelSpacingInformation(instance: any) {
   // See http://gdcm.sourceforge.net/wiki/index.php/Imager_Pixel_Spacing
   
   // TODO: Add Ultrasound region spacing

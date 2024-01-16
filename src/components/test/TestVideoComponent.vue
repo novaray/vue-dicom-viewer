@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Enums, getRenderingEngine, RenderingEngine, type Types } from '@cornerstonejs/core';
-import addButtonToToolbar from '@/helpers/dicom/addButtonToToolbar';
-import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
+import { addButtonToToolbar, createImageIdsAndCacheMetaData } from '@/helpers/dicom';
 
 const {ViewportType, Events} = Enums;
 

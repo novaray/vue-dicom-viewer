@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { wadouri } from '@cornerstonejs/dicom-image-loader';
 import { onMounted, reactive, ref } from 'vue';
-import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom/convertMultiframeImageIds';
+import { convertMultiframeImageIds, prefetchMetadataInformation } from '@/helpers/dicom';
 import { PanTool, StackScrollMouseWheelTool, ToolGroupManager, WindowLevelTool, ZoomTool, addTool, removeTool } from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings } from '@cornerstonejs/tools/dist/cjs/enums';

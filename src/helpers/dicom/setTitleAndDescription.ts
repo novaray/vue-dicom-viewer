@@ -1,4 +1,4 @@
-export default function setTitleAndDescription(titleText: string, descriptionText: string) {
+export function setTitleAndDescription(titleText: string, descriptionText: string) {
   const title = document.getElementById('demo-title');
   const description = document.getElementById('demo-description');
   

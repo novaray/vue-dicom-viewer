@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
+import { createImageIdsAndCacheMetaData } from '@/helpers/dicom';
 import { Enums, RenderingEngine, setVolumesForViewports, volumeLoader } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { addTool, BidirectionalTool, ToolGroupManager } from '@cornerstonejs/tools';

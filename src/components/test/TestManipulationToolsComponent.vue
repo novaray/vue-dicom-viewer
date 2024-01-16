@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
-import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
+import { createImageIdsAndCacheMetaData } from '@/helpers/dicom';
 import { cache, RenderingEngine } from '@cornerstonejs/core';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
 import { addTool, ToolGroupManager, WindowLevelTool, ZoomTool, removeTool } from '@cornerstonejs/tools';

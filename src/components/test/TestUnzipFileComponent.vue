@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { wadouri } from '@cornerstonejs/dicom-image-loader';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { convertMultiframeImageIds } from '@/helpers/dicom/convertMultiframeImageIds';
+import { convertMultiframeImageIds } from '@/helpers/dicom';
 import {
   addTool, PanTool, removeTool, StackScrollMouseWheelTool, ToolGroupManager, utilities, WindowLevelTool, ZoomTool
 } from '@cornerstonejs/tools';

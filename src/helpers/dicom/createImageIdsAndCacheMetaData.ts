@@ -5,10 +5,10 @@ import { getPTImageIdInstanceMetadata } from './getPTImageIdInstanceMetadata';
 import { utilities } from '@cornerstonejs/core';
 import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
 
-import ptScalingMetaDataProvider from './ptScalingMetaDataProvider';
-import getPixelSpacingInformation from './getPixelSpacingInformation';
+import { addInstance } from './ptScalingMetaDataProvider';
+import { getPixelSpacingInformation } from './getPixelSpacingInformation';
 import { convertMultiframeImageIds } from './convertMultiframeImageIds';
-import removeInvalidTags from './removeInvalidTags';
+import { removeInvalidTags } from './removeInvalidTags';
 import type { InstanceMetadata } from '@cornerstonejs/calculate-suv/src/types';
 
 // @ts-ignore
@@ -25,7 +25,7 @@ const {calibratedPixelSpacingMetadataProvider} = utilities;
  *
  * @returns {string[]} An array of imageIds for instances in the study.
  */
-export default async function createImageIdsAndCacheMetaData({
+export async function createImageIdsAndCacheMetaData({
                                                                StudyInstanceUID,
                                                                SeriesInstanceUID,
                                                                SOPInstanceUID = null,
@@ -130,7 +130,7 @@ export default async function createImageIdsAndCacheMetaData({
           InstanceMetadataArray
         );
         InstanceMetadataArray.forEach((instanceMetadata, index) => {
-          ptScalingMetaDataProvider.addInstance(
+          addInstance(
             imageIds[index],
             suvScalingFactors[index]
           );

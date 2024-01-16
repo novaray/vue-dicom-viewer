@@ -1,4 +1,4 @@
-export default function addButtonToToolbar({
+export function addButtonToToolbar({
                                              id,
                                              title,
                                              container,

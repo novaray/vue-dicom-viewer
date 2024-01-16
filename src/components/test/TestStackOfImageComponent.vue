@@ -2,7 +2,7 @@
 import { cache, RenderingEngine } from '@cornerstonejs/core';
 import type { PublicViewportInput } from '@cornerstonejs/core/src/types/IViewport';
 import { ViewportType } from '@cornerstonejs/core/src/enums';
-import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
+import { createImageIdsAndCacheMetaData } from '@/helpers/dicom';
 import { onMounted, reactive, ref } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 

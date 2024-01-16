@@ -1,7 +1,7 @@
 import { metaData } from '@cornerstonejs/core';
 import type { InstanceMetadata } from '@cornerstonejs/calculate-suv';
 
-export default function getPTImageIdInstanceMetadata(
+export function getPTImageIdInstanceMetadata(
   imageId: string
 ): InstanceMetadata {
   const petSequenceModule = metaData.get('petIsotopeModule', imageId);
@@ -207,5 +207,3 @@ function convertInterfaceDateToString(date: any): string {
   const dateString = `${date.year}${month}${day}`;
   return dateString;
 }
-
-export { getPTImageIdInstanceMetadata };

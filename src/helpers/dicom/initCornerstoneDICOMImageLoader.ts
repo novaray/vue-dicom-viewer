@@ -9,7 +9,7 @@ import cornerstoneDICOMImageLoader from '@cornerstonejs/dicom-image-loader';
 const { preferSizeOverAccuracy, useNorm16Texture } =
   cornerstone.getConfiguration().rendering;
 
-export default function initCornerstoneDICOMImageLoader() {
+export function initCornerstoneDICOMImageLoader() {
   cornerstoneDICOMImageLoader.external.cornerstone = cornerstone;
   cornerstoneDICOMImageLoader.external.dicomParser = dicomParser;
   cornerstoneDICOMImageLoader.configure({

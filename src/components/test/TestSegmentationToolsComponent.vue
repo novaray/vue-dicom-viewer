@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import createImageIdsAndCacheMetaData from '@/helpers/dicom/createImageIdsAndCacheMetaData';
+import { createImageIdsAndCacheMetaData } from '@/helpers/dicom';
 import { addTool, BrushTool, segmentation, SegmentationDisplayTool, ToolGroupManager } from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/cjs/types';
 import { MouseBindings, SegmentationRepresentations } from '@cornerstonejs/tools/dist/cjs/enums';
