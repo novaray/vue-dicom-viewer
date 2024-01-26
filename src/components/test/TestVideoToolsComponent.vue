@@ -289,6 +289,7 @@ onBeforeRouteLeave(() => {
     <input
       style="width:400px;height:8px;float: left"
       type="range"
+      step="0.1"
       v-model="range"
       @change="onChangeRange"
       @input="onInputRange"

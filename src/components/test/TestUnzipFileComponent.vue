@@ -37,6 +37,7 @@ const uploadedFiles = ref<UnzipFile[]>([]);
 const unzipLoading = ref(false);
 const fileMatchingLoading = ref(false);
 const stacks = ref<any[]>([]);
+const totalFiles = ref(0);
 
 const isLoading = computed(() => unzipLoading.value || fileMatchingLoading.value);
 const getLoadingText = computed(() => unzipLoading.value ? '파일 압축 해제 중' : '파일 매칭 중');
@@ -134,6 +135,7 @@ const onChangeFile = (event: Event) => {
                           return zipEntry.name.endsWith('.dcm');
                         })
                         .sort((zipEntry1, zipEntry2) => fileNameSortPredicate(zipEntry1.name, zipEntry2.name));
+       totalFiles.value = files.length;
 
        const promises = files.map((zipEntry) => {
          return zipEntry.async('blob')
@@ -226,21 +228,24 @@ onBeforeRouteLeave(() => {
       />
       <div ref="divTag"/>
     </div>
-    <div class="file-list-wrap">
-      <CommonLoadingSpinner
-        v-show="isLoading"
-        :text="getLoadingText"
-      />
-      <ul v-show="!unzipLoading">
-        <li
-          :class="getListClass"
-          v-for="(file, index) in uploadedFiles"
-          :key="file.name"
-          @click="onClickFile(index)"
-        >
-          {{ file.name }}
-        </li>
-      </ul>
+    <div style="margin-left: 1rem;">
+      <h3>Total files: {{totalFiles}}</h3>
+      <div class="file-list-wrap">
+        <CommonLoadingSpinner
+          v-show="isLoading"
+          :text="getLoadingText"
+        />
+        <ul v-show="!unzipLoading">
+          <li
+            :class="getListClass"
+            v-for="(file, index) in uploadedFiles"
+            :key="file.name"
+            @click="onClickFile(index)"
+          >
+            {{ file.name }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -259,7 +264,6 @@ onBeforeRouteLeave(() => {
 }
 
 .file-list-wrap {
-  margin-left: 1rem;
   height: 550px;
   width: 330px;
   overflow: auto;
