@@ -43,7 +43,19 @@ const router = createRouter({
           path: '/video-with-tools',
           name: 'videoTools',
           component: () => import('../views/example/ExampleVideoToolsView.vue')
-        },
+        }
+      ]
+    },
+    {
+      path: '/empty',
+      name: 'empty',
+      component: () => import('../views/layout/EmptyLayout.vue'),
+      children: [
+        {
+          path: '/empty/memory-file-view',
+          name: 'memoryFileView',
+          component: () => import('../views/example/ExampleMemoryFileView.vue')
+        }
       ]
     }
   ]

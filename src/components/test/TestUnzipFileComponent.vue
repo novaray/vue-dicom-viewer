@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { wadouri } from '@cornerstonejs/dicom-image-loader';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { convertMultiframeImageIds } from '@/helpers/dicom';
 import {
   addTool, PanTool, removeTool, StackScrollMouseWheelTool, ToolGroupManager, utilities, WindowLevelTool, ZoomTool
@@ -12,6 +12,19 @@ import { ViewportType } from '@cornerstonejs/core/src/enums';
 import JSZip from 'jszip';
 import CommonLoadingSpinner from '@/components/common/CommonLoadingSpinner.vue';
 import { onBeforeRouteLeave } from 'vue-router';
+
+interface Props {
+  file?: File;
+}
+const props = defineProps<Props>();
+
+watch(() => props.file, (file) => {
+  if (!file) {
+    return;
+  }
+
+  onChangeFile({target: {files: [file]}});
+});
 
 interface UnzipFile {
   name: string;
@@ -113,8 +126,8 @@ const run = async () => {
   toolGroup.addViewport(viewportId, renderingEngineId);
 };
 
-const onChangeFile = (event: Event) => {
-  const files = (event.target as HTMLInputElement).files;
+const onChangeFile = (event: { target: { files?: File[] } }) => {
+  const files = event.target.files;
   if (!files) {
     return;
   }
