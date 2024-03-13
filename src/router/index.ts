@@ -30,6 +30,11 @@ const router = createRouter({
           component: () => import('../views/example/ExampleUnzipFileView.vue')
         },
         {
+          path: '/image-file-upload',
+          name: 'imageFile',
+          component: () => import('../views/example/ExampleImageFileView.vue')
+        },
+        {
           path: '/manipulation-tools',
           name: 'manipulationTools',
           component: () => import('../views/example/ExampleManipulationToolsView.vue')

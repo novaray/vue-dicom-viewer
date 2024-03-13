@@ -16,6 +16,7 @@ const tabs = {
   'localFile': 'Local File',
   'localFileWithTools': 'Local File With Tools',
   'unzipFile': 'Unzip File',
+  'imageFile': 'Image File',
   'manipulationTools': 'Manipulation Tools',
   'video': 'video',
   'videoTools': 'videoTools',
